@@ -1,0 +1,69 @@
+/* Container du toast */
+.p-toast {
+  z-index: 99999 !important;
+}
+
+/* Message du toast */
+.p-toast-message-content,
+.p-toast-message-content * {
+  color: white !important;
+}
+
+/* Couleurs par type */
+.p-toast-message-success {
+  background-color: #16a34a !important;
+}
+
+.p-toast-message-info {
+  background-color: #0284c7 !important;
+}
+
+.p-toast-message-warn {
+  background-color: #ea580c !important;
+}
+
+.p-toast-message-error {
+  background-color: #dc2626 !important;
+}
+
+
+.bgtb{
+    background: #0f1115 url('@/assets/img/background/bg3.jpg') no-repeat; 
+    background-size: cover; 
+/*    background-position: center -70px;*/
+}
+
+/*.bgtb .card-body{
+    background: rgba(0, 0, 0, 0.1);
+}*/
+
+#logout {
+  color: red;
+  margin: 0.5rem 0.1rem;
+}
+#logout:hover {
+  background-color: #ff0028;
+  color: white;
+  border-radius:0.5rem;
+}
+
+/*pour le boutton favoris et animation*/
+.favorite-btn .pi {
+    transition: transform 0.2s ease;
+}
+
+.favorite-btn:active .pi {
+    transform: scale(1.4);
+}
+
+.favorite-btn .pi-heart-fill {
+    color: #ef4444;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    animation: heartPop 0.4s ease;
+}
+
+@keyframes heartPop {
+    0%   { transform: scale(0.5); }
+    50%  { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}

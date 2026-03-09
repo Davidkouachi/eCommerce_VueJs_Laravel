@@ -1,0 +1,212 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee p {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+
+/* DEBUT Alert Toast Compact Final */
+
+/* Container du Toast (position) */
+.p-toast.p-toast-top-right {
+  top: 0.4rem !important;
+  right: -1rem !important;
+  left: auto !important;
+  transform: none !important;
+}
+.p-toast.p-toast-top-center {
+  top: 0.4rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  right: auto !important;
+}
+.p-toast.p-toast-top-left {
+  top: 0.4rem !important;
+  left: 0.4rem !important;
+  right: auto !important;
+  transform: none !important;
+}
+.p-toast.p-toast-bottom-left {
+  bottom: 0.4rem !important;
+  left: 0.4rem !important;
+  right: auto !important;
+  transform: none !important;
+}
+.p-toast.p-toast-bottom-center {
+  bottom: 0.4rem !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+}
+.p-toast.p-toast-bottom-right {
+  bottom: 0.4rem !important;
+  right: 0.4rem !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+
+/* Conteneur principal */
+
+.p-toast {
+  z-index: 99999 !important; /* S'assure que le toast est au-dessus de tout */
+}
+
+.p-toast-message {
+  color: white !important;
+  font-weight: 400;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: 0.1rem 0.1rem !important;
+  font-size: 0.75rem !important; /* Texte plus petit */
+  /*width: fit-content !important;*/
+  max-width: 340px !important;
+  margin: 0.5rem auto !important;
+  margin-left: 2rem !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Icône de type (succès, erreur...) */
+.p-toast-icon {
+  font-size: 0.2rem;
+  margin-right: 0.5rem;
+  color: white !important;
+}
+
+/* Texte du message */
+.p-toast-summary,
+.p-toast-detail {
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+  font-size: 0.75rem !important;
+  color: white !important;
+}
+
+/* Conteneur du contenu */
+.p-toast-message-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Bouton de fermeture */
+.p-toast-icon-close {
+  font-size: 0.9rem;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.p-toast-icon-close:hover {
+  opacity: 1;
+}
+
+/* Couleurs selon le type de message */
+.p-toast-message-success {
+  background-color: #2e7d32 !important;
+}
+
+.p-toast-message-info {
+  background-color: #1565c0 !important;
+}
+
+.p-toast-message-warn {
+  background-color: #ef6c00 !important;
+}
+
+.p-toast-message-error {
+  background-color: #b71c1c !important;
+}
+
+/* FIN Alert Toast Compact Final */
+
+
+
+
+
+/*Datable boutton debut*/
+.dt-button {
+  background: transparent !important;
+  border: none !important;
+  padding: 0px 0px !important;
+
+  /*color: #fff !important;
+  border-radius: 10px !important;
+  font-size: 0.69rem !important;
+  font-weight: 500 !important;
+  margin-right: 0.1em !important;
+  transition: background-color 0.3s ease;*/
+}
+
+/*.dt-button i {
+  font-size: 0.7rem;
+}
+
+.dt-button:hover {
+  background-color: #233ecc;
+  color: #fff;
+}
+
+.dt-button:active {
+  background-color: #233ecc;
+}
+
+.dt-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}*/
+
+.dt-export-buttons {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+/*Datable boutton fin*/
+
+
+
+/* Réduire la hauteur et le padding des lignes du datatable */
+table.dataTable tbody tr {
+  height: 35px;              /* Hauteur de ligne réduite */
+}
+
+table.dataTable td {
+  padding: 0.8rem 0.8rem !important; /* Réduction du padding horizontal/vertical */
+  font-size: 0.75rem;        /* Police plus petite */
+}
+
+table.dataTable thead th {
+  padding: 0.5rem 0.5rem !important;
+  font-size: 0.75rem;
+}
+
+.table_style_primary thead tr th {
+  background-color: #2e37a4 !important; /* Couleur bleue Bootstrap */
+  color: #fff !important;
+}
