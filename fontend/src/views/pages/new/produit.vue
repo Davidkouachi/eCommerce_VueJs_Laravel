@@ -361,7 +361,7 @@
                             type="button" 
                             icon="pi pi-refresh" 
                             label="Réinitialiser" 
-                            @click="reloadloadProducts()" 
+                            @click="reloadProducts()" 
                             severity="warn"
                         />
                     </div>
@@ -440,7 +440,6 @@ const totalProducts = computed(() => productStore.totalProducts)
 const currentPage = computed(() => productStore.currentPage)
 
 const loading = ref(false)
-const firstLoad = ref(false)
 const limit = productStore.limit
 // const first = ref(productStore.first)
 
@@ -548,8 +547,46 @@ const loadProducts = async (page = 1) => {
     productStore.loaded = true
 
     loading.value = false
-    firstLoad.value = true
+}
 
+const reloadProducts = async () => {
+    loading.value = true
+
+    // Réinitialise la pagination
+    const page = 1
+    first.value = 0
+
+    const offset = (page - 1) * limit
+
+    // Tu peux soit réutiliser les filtres actuels, soit remettre les valeurs par défaut
+    const filters = {
+        searchQuery: '',       // ou '' si tu veux reset
+        selectedCategory: 0, // ou 0
+        minPrix: 0,               // ou 0
+        maxPrix: 1000000,               // ou 1000000
+        livraison: 0,   // ou 0
+        stock: 0,           // ou 0
+        layout: 'grid'                  // ou 'grid'
+    }
+
+    const result = await ProductService.getProductsPaginated(
+        offset,
+        limit,
+        filters
+    )
+
+    // Mise à jour du store
+    productStore.products = result.products
+    productStore.totalProducts = result.total
+    productStore.currentPage = page
+    productStore.filters = filters
+    productStore.loaded = true
+
+    // Mise à jour du state local
+    loading.value = false
+
+    // Si tu veux remettre le scroll en haut après reload
+    window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 /* ---------------------------------------------
