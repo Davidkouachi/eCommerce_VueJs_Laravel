@@ -1,9 +1,13 @@
 <template>
     <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
-            <!-- <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
-                <i class="pi pi-bars"></i>
-            </button> -->
+            <button
+                v-if="auth.isAuthenticated && ['administrateur', 'user'].includes(auth.user.role)"
+                class="layout-menu-button layout-topbar-action"
+                @click="toggleMenu"
+            >
+              <i class="pi pi-bars"></i>
+            </button>
             <div class="mt-0 flex items-center left-0 gap-2">
                 <router-link to="/" class="layout-topbar-logo xl:hidden">
                     <img src="@/assets/img/logo.png" class="w-[3rem] shrink-0" alt="Logo">
@@ -123,29 +127,65 @@ const drawerUse = useDrawerStore();
 const breadcrumbMenu = useBreadcrumbMenuStore();
 const authComptes = useAuthCompteStore();
 
-const itemsConnecter = ref([
-    {
-        separator: true
-    },
-    {
-        label: 'Profil',
-        items: [
-            {
-                label: 'Settings',
-                icon: 'pi pi-cog',
-                badge: 2,
-            },
-        ]
-    },
-    {
-        separator: true
-    },
-    {   
-        id: 'logout',
-        label: 'Deconnexion',
-        icon: 'pi pi-sign-out',
-    }
-]);
+const itemsConnecter = computed(() => {
+    const menu = [
+        {
+            separator: true
+        },
+        {
+            label: 'Compte',
+            items: [
+                {
+                    label: 'Profil',
+                    icon: 'pi pi-user',
+                },
+                {
+                    label: 'Vos commandes',
+                    icon: 'pi pi-shopping-bag',
+                    badge: 2,
+                },
+                {
+                    label: 'Favoris',
+                    icon: 'pi pi-heart',
+                    badge: 2,
+                },
+                {
+                    label: 'Sécurité',
+                    icon: 'pi pi-shield',
+                },
+            ]
+        }
+    ];
+
+    // 👉 Ajout du menu configuration si administrateur
+    // if (auth.user?.role === 'administrateur') {
+    //     menu.push({
+    //         label: 'Configuration',
+    //         items: [
+    //             {
+    //                 label: 'Utilisateurs',
+    //                 icon: 'pi pi-users',
+    //             },
+    //             {
+    //                 label: 'Paramètres',
+    //                 icon: 'pi pi-cog',
+    //             }
+    //         ]
+    //     });
+    // }
+
+    // menu de fin
+    menu.push(
+        { separator: true },
+        {
+            id: 'logout',
+            label: 'Déconnexion',
+            icon: 'pi pi-sign-out',
+        }
+    );
+
+    return menu;
+});
 
 const itemsNonConnecter = ref([
     {   
@@ -299,7 +339,7 @@ const getFooterButtonsConnexion = () => [
 const openAuthConnexion = () => {
 
     authComptes.show(
-        "Connexion",
+        null,
         null,
         'top',
         "30rem",

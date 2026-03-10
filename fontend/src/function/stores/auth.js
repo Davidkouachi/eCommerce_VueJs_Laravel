@@ -5,7 +5,7 @@ import { ref } from "vue";
 import { setSecureItem, getSecureItem, removeSecureItem } from "@/function/stores/secureStorage";
 
 let countdownInterval = null;
-let inactivityMin = 1;
+let inactivityMin = 55;
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({

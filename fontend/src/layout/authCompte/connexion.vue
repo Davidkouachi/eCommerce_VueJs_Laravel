@@ -2,7 +2,9 @@
 
     <form autocomplete="off">
         <div class="text-center mb-8">
-            <img height="130" width="130" src="@/assets/img/logo.png" class="mb-8 w-23 shrink-0 mx-auto" alt="Logo">
+            <div class="text-center">
+                <Avatar icon="pi pi-user" class="block mx-auto mb-4 bg-primary" size="xlarge" shape="circle" style="background-image: radial-gradient(circle at left top, var(--p-primary-400), var(--p-primary-700)); color:white;"/>
+            </div>
             <span class="text-muted-color font-medium">Plateforme de gestion santé</span>
         </div>
         <div class="flex flex-col gap-6 rounded-2xl">

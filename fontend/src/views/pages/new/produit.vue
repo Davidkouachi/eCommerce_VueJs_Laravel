@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col" ref="productTop">
 
-        <Toolbar v-if="firstLoad" class="!bg-surface-0">
+        <Toolbar class="!bg-surface-0">
             <template #start>
                 <div class="flex justify-center items-center">
                     <div class="font-bold text-2xl text-surface-600">Produits</div>
@@ -31,6 +31,7 @@
                         @click="openDialogRech()" 
                         severity="warn"
                         variant=""
+                        :disabled="products.length === 0"
                     />
                 </div>
             </template>
@@ -393,7 +394,7 @@
             :totalRecords="totalProducts"
             :first="first"
             @page="onPageChange"
-            :rowsPerPageOptions="[18, 36, 54]"
+            :rowsPerPageOptions="[18,36,54]"
             template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             class="mt-6"
         />
@@ -402,181 +403,199 @@
 </template>
 
 <script setup>
-import { ProductService } from '@/service/ProductList';
-import { ref, computed, onMounted, watch, markRaw, nextTick } from 'vue';
+
+defineOptions({
+    name: 'ProduitList'
+})
+
+import { ProductService } from '@/service/ProductList'
+import { ref, computed, onMounted, onActivated, watch, markRaw, nextTick, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useDialogStore } from '@/function/stores/dialog';
+
+import { useDialogStore } from '@/function/stores/dialog'
 import { useFavoriteStore } from '@/function/stores/product/favories'
-import { useProductUtilsStore  } from '@/function/stores/product/utils'
+import { useProductUtilsStore } from '@/function/stores/product/utils'
 import { useFlyingCartStore } from '@/function/stores/product/flyingCart'
+import { useProductListStore } from '@/function/stores/product/productListStore'
+
 import rechOption from './produitRech.vue'
 
 const router = useRouter()
 const route = useRoute()
 
-const dialogUse = useDialogStore();
-
+const dialogUse = useDialogStore()
 const favoriteStore = useFavoriteStore()
 const utilsStore = useProductUtilsStore()
 const flyingCart = useFlyingCartStore()
+const productStore = useProductListStore()
 
-const goToProduct = (product) => {
+/* ---------------------------------------------
+   STATE
+--------------------------------------------- */
 
-    router.push({
-        name: 'element_produit_detail',
-        params: { code: product.code },
-        query: {
-            // 🔹 On passe tous les filtres et la pagination
-            search: route.query.search || '',
-            category: Number(route.query.category) || 0,
-            minPrix: Number(route.query.minPrix) || 0,
-            maxPrix: Number(route.query.maxPrix) || 1000000,
-            livraison: Number(route.query.livraison) || 0,
-            stock: Number(route.query.stock) || 0,
-            layout: route.query.layout || 'grid',
-            page: Number(route.query.page) || 1,
-            
-            // 🔹 code du produit pour scroller au retour
-            fromProductCode: product.code
-        }
-    })
-}
+const productTop = ref(null)
 
-// --- Références
-const productTop = ref(null);
-const products = ref([]);
-const layout = ref('grid');
-const options = ref(['grid', 'list']);
+const products = computed(() => productStore.products)
+const totalProducts = computed(() => productStore.totalProducts)
+const currentPage = computed(() => productStore.currentPage)
 
-const limit = 54;  
-const currentPage = ref(1);
-const totalProducts = ref(0);
-const loading = ref(false);
-const firstLoad = ref(false);
+const loading = ref(false)
+const firstLoad = ref(false)
+const limit = productStore.limit
+// const first = ref(productStore.first)
 
-const searchQuery = ref('');
-const minPrix = ref(0)    // prix min
-const maxPrix = ref(1000000) // prix max par défaut
-const selectedLivraison = ref(0);
+// Pour que la pagination reste sur la bonne page quand on revient
+const first = ref((productStore.currentPage - 1) * limit)
+
+const layout = ref(productStore.filters.layout)
+const options = ref(productStore.options)
+
+const searchQuery = ref(productStore.filters.searchQuery)
+const selectedCategory = ref(productStore.filters.selectedCategory)
+const minPrix = ref(productStore.filters.minPrix)
+const maxPrix = ref(productStore.filters.maxPrix)
+const selectedLivraison = ref(productStore.filters.livraison)
+const selectedStock = ref(productStore.filters.stock)
+
+/* ---------------------------------------------
+   OPTIONS
+--------------------------------------------- */
+
 const livraisonOptions = ref([
     { label: 'Tous', value: 0 },
     { label: 'Gratuite', value: 1 },
-    { label: 'Payante', value: 2 },
-]);
+    { label: 'Payante', value: 2 }
+])
 
-const selectedCategory = ref(0);
 const categoryOptions = ref([
     { label: 'Tous', value: 0 },
     { label: 'Accessories', value: 1 },
     { label: 'Shoes', value: 2 },
     { label: 'Fashion', value: 3 },
-    { label: 'Electronics', value: 4 },
-    { label: 'Informatique', value: 5 },
-    { label: 'Hommes', value: 6 },
-]);
+    { label: 'Electronics', value: 4 }
+])
 
-const selectedStock = ref(0);
 const stockOptions = ref([
     { label: 'Tous', value: 0 },
     { label: 'En stock', value: 1 },
     { label: 'Stock faible', value: 2 },
-    { label: 'Rupture', value: 3 },
-]);
+    { label: 'Rupture', value: 3 }
+])
 
-const cartIcon = ref(null)
+/* ---------------------------------------------
+   CART ANIMATION
+--------------------------------------------- */
+
 function addToCart(item) {
+
     flyingCart.flyToCart(
         `#product-image-${item.code}`,
         '#global-cart-icon',
         { startSize: 50, endSize: 20 }
     )
+
 }
 
-// --- Charger les produits pour une page
-const loadProducts = async (page = 1, filters = {}) => {
-    loading.value = true;
+/* ---------------------------------------------
+   NAVIGATION PRODUIT
+--------------------------------------------- */
 
-    const offset = (page - 1) * limit;
+const goToProduct = async (product) => {
+    // Sauvegarde le code du produit dans le store
+    productStore.saveLastProduct(product.code)
+
+    // Attend que le DOM soit prêt (utile si la page est KeepAlive ou en cours de rendu)
+    await nextTick()
+
+    // Puis navigue vers la page détail
+    router.push({
+        name: 'element_produit_detail',
+        params: { code: product.code }
+    })
+}
+
+/* ---------------------------------------------
+   LOAD PRODUCTS
+--------------------------------------------- */
+
+const loadProducts = async (page = 1) => {
+
+    loading.value = true
+
+    const offset = (page - 1) * limit
+
+    const filters = {
+        searchQuery: searchQuery.value,
+        selectedCategory: selectedCategory.value,
+        minPrix: minPrix.value,
+        maxPrix: maxPrix.value,
+        livraison: selectedLivraison.value,
+        stock: selectedStock.value,
+        layout: layout.value
+    }
 
     const result = await ProductService.getProductsPaginated(
         offset,
         limit,
-        filters // 🔥 passer tout l'objet filtre
-    );
+        filters
+    )
 
-    products.value = result.products;
-    totalProducts.value = result.total;
-    
-    loading.value = false;
-    firstLoad.value = true;
-    currentPage.value = page;
+    productStore.products = result.products
+    productStore.totalProducts = result.total
+    productStore.currentPage = page
 
-    scrollProduit()
-};
+    productStore.filters = filters
+    productStore.loaded = true
 
-function reloadloadProducts() {
-    searchQuery.value = ''
-    selectedCategory.value = 0
-    layout.value = 'grid'
-    minPrix.value = 0
-    maxPrix.value = 1000000
-    selectedLivraison.value = 0
-    selectedStock.value = 0
+    loading.value = false
+    firstLoad.value = true
 
-    loadProducts(1, {
-        searchQuery: searchQuery.value,
-        selectedCategory: selectedCategory.value,
-        layout: layout.value,
-        minPrix: minPrix.value,
-        maxPrix: maxPrix.value,
-        livraison: selectedLivraison.value,
-        stock: selectedStock.value,
-    });
 }
 
-// --- Pagination
-const totalPages = computed(() => Math.ceil(totalProducts.value / limit));
-const goToPage = (page) => {
-    if (page < 1 || page > totalPages.value) return;
+/* ---------------------------------------------
+   PAGINATION
+--------------------------------------------- */
 
-    loadProducts(page, {
-        searchQuery: searchQuery.value,
-        selectedCategory: selectedCategory.value,
-        minPrix: minPrix.value,
-        maxPrix: maxPrix.value,
-        livraison: selectedLivraison.value,
-        stock: selectedStock.value,
-    });
+const totalPages = computed(() => {
+    return Math.ceil(totalProducts.value / limit)
+})
 
-    scrollToTop();
-};
-
-const first = ref(0) // index du premier élément
-const onPageChange = (event) => {
-
+const onPageChange = async (event) => {
+    productStore.resetScroll()
     first.value = event.first
-    currentPage.value = event.page + 1
-
-    router.replace({
-        query: {
-            ...route.query,
-            page: currentPage.value
-        }
-    })
-
-    loadProducts(currentPage.value, {
-        searchQuery: searchQuery.value,
-        selectedCategory: selectedCategory.value,
-        minPrix: minPrix.value,
-        maxPrix: maxPrix.value,
-        livraison: selectedLivraison.value,
-        stock: selectedStock.value,
-    });
-
-    scrollToTop();
+    const page = event.page + 1
+    await loadProducts(page)
 }
 
-// ------------------------ ajouter & modifier une ligne -----------------------------
+/* ---------------------------------------------
+   SCROLL
+--------------------------------------------- */
+
+const scrollY = ref(0)  // 🔥 stocke la position du scroll
+
+// Fonction qui met à jour scrollY
+const updateScroll = () => {
+  scrollY.value = window.scrollY || document.documentElement.scrollTop
+}
+
+// On écoute le scroll au montage du composant
+onMounted(() => {
+  window.addEventListener('scroll', updateScroll)
+})
+
+// On nettoie l'écouteur quand le composant est détruit
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateScroll)
+})
+
+// Watch pour afficher en temps réel
+watch(scrollY, (newVal) => {
+    productStore.scrollY = newVal
+})
+
+/* ---------------------------------------------
+   FILTRES
+--------------------------------------------- */
 const getFooterButtons = () => [
     {
         id: 'logout',
@@ -611,6 +630,7 @@ const openDialogRech = () => {
         "30rem",
         markRaw(rechOption),
         {
+
             searchQuery,
             minPrix,
             maxPrix,
@@ -618,133 +638,95 @@ const openDialogRech = () => {
             selectedCategory,
             selectedStock,
             layout,
+
             categoryOptions: () => categoryOptions.value,
             livraisonOptions: () => livraisonOptions.value,
             stockOptions: () => stockOptions.value,
+
             applyFilters: ({ 
-                searchQuery: newSearch, 
-                selectedCategory: newCategory, 
-                layout: newLayout, 
-                minPrix: newMinPrix, 
-                maxPrix: newMaxPrix, 
-                selectedLivraison: newSelectedLivraison,
-                selectedStock: newSelectedStock }) => {
-                    // 🔹 mettre à jour les refs
-                    searchQuery.value = newSearch;
-                    selectedCategory.value = newCategory;
-                    layout.value = newLayout;
-                    minPrix.value = newMinPrix;
-                    maxPrix.value = newMaxPrix;
-                    selectedLivraison.value = newSelectedLivraison;
-                    selectedStock.value = newSelectedStock;
+                searchQuery: newSearch,
+                selectedCategory: newCategory,
+                layout: newLayout,
+                minPrix: newMinPrix,
+                maxPrix: newMaxPrix,
+                selectedLivraison: newLivraison,
+                selectedStock: newStock
+            }) => {
 
-                    // 🔹 reset pagination
-                    currentPage.value = 1;
+                searchQuery.value = newSearch
+                selectedCategory.value = newCategory
+                layout.value = newLayout
+                minPrix.value = newMinPrix
+                maxPrix.value = newMaxPrix
+                selectedLivraison.value = newLivraison
+                selectedStock.value = newStock
 
-                    // 🔹 appeler loadProducts avec toutes les infos
-                    router.replace({
-                        name: 'element_produit',
-                        query: {
-                            search: newSearch || undefined,
-                            category: newCategory || undefined,
-                            minPrix: newMinPrix || undefined,
-                            maxPrix: newMaxPrix || undefined,
-                            livraison: newSelectedLivraison || undefined,
-                            stock: newSelectedStock || undefined,
-                            layout: newLayout || undefined
-                        }
-                    })
+                loadProducts(1)
 
-                    loadProducts(1, {
-                        searchQuery: newSearch,
-                        selectedCategory: newCategory,
-                        layout: newLayout,
-                        minPrix: newMinPrix,
-                        maxPrix: newMaxPrix,
-                        livraison: newSelectedLivraison,
-                        stock: newSelectedStock,
-                    });
-                },
-            reloadloadProducts
-    },
-    { footerBtn: getFooterButtons() }
-  )
+            }
+
+        },
+        { footerBtn: getFooterButtons() }
+    )
+
 }
 
-// ------------------------ supprimer une ligne -----------------------------
+/* ---------------------------------------------
+   MOUNT
+--------------------------------------------- */
 
-function scrollToTop() {
-    if (productTop.value) {
-        productTop.value.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
+onMounted(async () => {
+
+    await nextTick()
+    if (!productStore.loaded) {
+        await loadProducts(productStore.currentPage)
     }
-}
-
-async function scrollProduit() {
-    const fromCode = route.query.fromProductCode
-    if (fromCode) {
-        await nextTick() // attend que le DOM soit mis à jour
-        const el = document.getElementById(`product-${fromCode}`)
-        if (el) {
-            console.log('Scroll to product:', fromCode)
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            el.classList.add('product-highlight')
-            setTimeout(() => el.classList.remove('product-highlight'), 1500)
-        }
-    }
-}
-
-function updateCategoryOptions() {
-    const unique = [...new Set(products.value.map(p => p.category))];
-
-    categoryOptions.value = [
-        { label: 'Tous', value: 'all' },
-        ...unique.map(cat => ({
-            label: cat,
-            value: cat
-        }))
-    ];
-}
-
-// --- Chargement initial
-onMounted(() => {
-
-    searchQuery.value = route.query.search ?? ''
-
-    selectedCategory.value = Number(route.query.category) || 0
-    minPrix.value = Number(route.query.minPrix) || 0
-    maxPrix.value = Number(route.query.maxPrix) || 1000000
-    selectedLivraison.value = Number(route.query.livraison) || 0
-    selectedStock.value = Number(route.query.stock) || 0
-
-    layout.value = route.query.layout ?? 'grid'
-
-    const page = Number(route.query.page) || 1
-    currentPage.value = page
-    first.value = (page - 1) * limit
-
-    loadProducts(page, {
-        searchQuery: searchQuery.value,
-        selectedCategory: selectedCategory.value,
-        layout: layout.value,
-        minPrix: minPrix.value,
-        maxPrix: maxPrix.value,
-        livraison: selectedLivraison.value,
-        stock: selectedStock.value,
-    });
 })
 
-watch(
-    () => loading.value,
-    async (isLoading) => {
-        // Quand le loading passe à false, c'est que les produits sont affichés
-        if (!isLoading) {
-            scrollProduit()
-        }
-    }
-)
+// // Après chargement des produits
+// watch(
+//     () => productStore.products,
+//     async (products) => {
+//         if (productStore.loaded && products.length) {
+//             await nextTick()
+//             productStore.restoreScroll()        // scroll normal si tu revenais de la page produit
+//             // productStore.scrollToLastProduct() // scroll vers le produit cliqué
+//         }
+//     }
+// )
+
+/* ---------------------------------------------
+   KEEPALIVE RETURN
+--------------------------------------------- */
+
+onActivated(async () => {
+    // attendre nextTick garantit que le DOM est prêt
+    await nextTick()
+    console.log('revenu')
+    productStore.restoreScroll()
+})
+
+/* ---------------------------------------------
+   WATCH
+--------------------------------------------- */
+
+// watch(
+//     () => loading.value,
+//     async (isLoading) => {
+
+//         if (!isLoading) {
+
+//             await nextTick()
+
+//         }
+//     }
+// )
+
+// Comme tu utilises un store Pinia, il vaut mieux synchroniser first.
+watch(currentPage, (page) => {
+    first.value = (page - 1) * limit
+})
+
 </script>
 
 <style>

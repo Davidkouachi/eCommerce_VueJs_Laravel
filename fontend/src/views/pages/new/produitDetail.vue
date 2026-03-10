@@ -12,6 +12,12 @@
     <div v-else >
         <!-- Informations principales -->
         <div class="card rounded">
+            <Button
+                icon="pi pi-arrow-left"
+                label="Retour"
+                severity="danger"
+                @click="goBack"
+            />
             <div class="grid grid-cols-12 gap-6">
                 <div class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-6 p-2 flex flex-col gap-2">
                     <Galleria :value="images" :responsiveOptions="responsiveOptions" :numVisible="5" containerStyle="max-width: 100%">
@@ -410,21 +416,15 @@ const goToProduct = (product) => {
     router.push({
         name: 'element_produit_detail',
         params: { code: product.code },
-        query: {
-            // 🔹 On passe tous les filtres et la pagination
-            search: route.query.search || '',
-            category: Number(route.query.category) || 0,
-            minPrix: Number(route.query.minPrix) || 0,
-            maxPrix: Number(route.query.maxPrix) || 1000000,
-            livraison: Number(route.query.livraison) || 0,
-            stock: Number(route.query.stock) || 0,
-            layout: route.query.layout || 'grid',
-            page: Number(route.query.page) || 1,
-            
-            // 🔹 code du produit pour scroller au retour
-            fromProductCode: product.code
-        }
     })
+}
+
+const goBack = () => {
+    if (window.history.length > 1) {
+        router.back()
+    } else {
+        router.push({ path: '/' }) // route par défaut
+    }
 }
 
 const loading = ref(true);
@@ -575,8 +575,10 @@ const getSeverity = (status) => {
 };
 
 const loadProduct = async () => {
+
     loading.value = true
     const code = route.params.code
+    // const code = route.query.fromProductCode
 
     const res = await ProductService.getProductById(code)
 

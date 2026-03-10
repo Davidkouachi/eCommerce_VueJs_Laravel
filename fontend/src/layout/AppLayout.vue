@@ -117,6 +117,8 @@
         <Dialog 
             v-model:visible="authComptes.loading"
             modal
+            :dismissableMask="false"
+            :closable="false"
             :position="authComptes.position"
             :style="{ width: authComptes.width }">
             <template #header>
@@ -215,7 +217,11 @@
                             </span>
                         </nav>
                     </div> -->
-                    <router-view></router-view>
+                    <router-view v-slot="{ Component }">
+                        <KeepAlive include="ProduitList">
+                            <component :is="Component" />
+                        </KeepAlive>
+                    </router-view>
                 </div>
             </div>
             <app-footer></app-footer>
@@ -343,13 +349,31 @@ const verifLoginForm = async () => {
     }
 };
 
+// const containerClass = computed(() => {
+//     return {
+//         'layout-overlay': layoutConfig.menuMode === 'overlay',
+//         'layout-static': layoutConfig.menuMode === 'static',
+//         'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
+//         'layout-overlay-active': layoutState.overlayMenuActive,
+//         'layout-mobile-active': layoutState.staticMenuMobileActive
+//     };
+// });
+
 const containerClass = computed(() => {
+    // Vérifier si l'utilisateur est connecté et rôle autorisé
+    const isAuthorized =
+        auth.user && ['administrateur', 'user'].includes(auth.user.role);
+
+    // Déterminer le mode de menu à appliquer
+    const menuMode = isAuthorized ? 'static' : 'overlay';
+
     return {
-        'layout-overlay': layoutConfig.menuMode === 'overlay',
-        'layout-static': layoutConfig.menuMode === 'static',
-        'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
+        'layout-overlay': menuMode === 'overlay',
+        'layout-static': menuMode === 'static',
+        'layout-static-inactive':
+            layoutState.staticMenuDesktopInactive && menuMode === 'static',
         'layout-overlay-active': layoutState.overlayMenuActive,
-        'layout-mobile-active': layoutState.staticMenuMobileActive
+        'layout-mobile-active': layoutState.staticMenuMobileActive,
     };
 });
 
@@ -477,6 +501,25 @@ watch( () => auth.expired, async (val) => {
 
     swalShown = false;
 });
+
+// Watcher pour la déconnexion
+watch(
+  () => auth.isAuthenticated,  // ou () => !!auth.user
+  (isAuth) => {
+    if (!isAuth) {
+      // utilisateur déconnecté
+
+      const currentRoute = router.currentRoute.value;
+
+      // Si la route nécessite l'auth et n'est pas la page produit
+      if (currentRoute.meta.requiresAuth) {
+        router.replace({ path: '/' });
+      }
+      // sinon on ne fait rien
+    }
+  },
+  { immediate: false } // pas besoin de trigger au montage
+);
 
 // watch(() => drawerUse.loading, (isOpen) => {
 //     if (isOpen) {
