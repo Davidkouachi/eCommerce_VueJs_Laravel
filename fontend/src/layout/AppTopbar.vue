@@ -10,7 +10,7 @@
             </button>
             <div class="mt-0 flex items-center left-0 gap-2">
                 <router-link to="/" class="layout-topbar-logo xl:hidden">
-                    <img src="@/assets/img/logo.png" class="w-[3rem] shrink-0" alt="Logo">
+                    <img src="@/assets/img/logo.jpg" class="w-[8.5rem] shrink-0" alt="Logo">
                 </router-link>
                 <!-- <span class="font-semibold text-[1.5rem]" v-if="breadcrumbMenu.items.length">
                     {{ breadcrumbMenu.items[breadcrumbMenu.items.length - 1].label }}
@@ -54,7 +54,7 @@
                     v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
                 >
                     <!-- <i class="pi pi-user"></i> -->
-                    <img src="@/assets/img/user.png" class="w-[3rem] shrink-0 mr-2 border rounded-full" alt="Logo">
+                    <img src="@/assets/img/user.png" class="w-[3rem] shrink-0 border rounded-full" alt="Logo">
                 </button>
 
                 <div
@@ -114,6 +114,7 @@ import { useToastAlert } from '@/function/function/ToastAlert';
 import { useConfirm } from "primevue/useconfirm";
 import { useBreadcrumbMenuStore } from '@/function/stores/breadcrumbMenu';
 import { useAuthCompteStore } from '@/function/stores/auth/compte';
+import { useAuthDialogStore } from '@/function/stores/auth/authDialog'
 
 import NotificationList from "@/components/perso/NotificationList.vue";
 import authConnexion from "@/layout/authCompte/connexion.vue";
@@ -126,6 +127,7 @@ const confirm = useConfirm();
 const drawerUse = useDrawerStore();
 const breadcrumbMenu = useBreadcrumbMenuStore();
 const authComptes = useAuthCompteStore();
+const authDialog = useAuthDialogStore()
 
 const itemsConnecter = computed(() => {
     const menu = [
@@ -191,7 +193,7 @@ const itemsNonConnecter = ref([
     {   
         label: 'Se connecter',
         icon: 'pi pi-sign-in',
-        command: () => openAuthConnexion()
+        command: () => authDialog.requireLogin()
     },
     {   
         label: 'Créer un compte',
@@ -316,38 +318,6 @@ function handleItemClick (item, position = 'center') {
 
     }
 };
-
-const getFooterButtonsConnexion = () => [
-    {
-        id: 'logout',
-        label: 'Fermer',
-        icon: 'pi pi-times',
-        variant: 'outlined',
-        severity: 'danger',
-        command: () => authComptes.hide()
-    },
-    {
-
-        id: 'connect',
-        label: 'Connexion',
-        loadingLabel: 'Vérification en cours...',
-        icon: '',
-        severity: 'success',
-        command: () => authComptes.callComponentMethod('submit')
-    },
-]
-const openAuthConnexion = () => {
-
-    authComptes.show(
-        null,
-        null,
-        'top',
-        "30rem",
-        markRaw(authConnexion),
-        {},
-        { footerBtn: getFooterButtonsConnexion() }
-    )
-}
 
 onMounted(() => {
     console.log('lancé')

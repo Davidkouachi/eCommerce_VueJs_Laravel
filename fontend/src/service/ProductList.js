@@ -12,7 +12,7 @@ export const ProductService = {
                 livraison: 1,
                 categoryID: 1,
                 category: 'accessories',
-                qte: 40,
+                qte: 4,
                 qteLimit: 10,
                 dateCreat: '2026-02-20',
                 eval: 3.5
@@ -26,7 +26,7 @@ export const ProductService = {
                 livraison: 2,
                 categoryID: 2,
                 category: 'shoes',
-                qte: 8,
+                qte: 10,
                 qteLimit: 10,
                 dateCreat: '2026-01-15',
                 eval: 4

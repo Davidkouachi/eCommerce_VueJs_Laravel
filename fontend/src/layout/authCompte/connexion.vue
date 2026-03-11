@@ -2,10 +2,12 @@
 
     <form autocomplete="off">
         <div class="text-center mb-8">
-            <div class="text-center">
-                <Avatar icon="pi pi-user" class="block mx-auto mb-4 bg-primary" size="xlarge" shape="circle" style="background-image: radial-gradient(circle at left top, var(--p-primary-400), var(--p-primary-700)); color:white;"/>
+            <div class="flex justify-center mb-6">
+                <img src="@/assets/img/logo.jpg" class="w-[15rem] shrink-0" alt="Logo">
             </div>
-            <span class="text-muted-color font-medium">Plateforme de gestion santé</span>
+            <span class="text-muted-color font-medium text-center">
+                Plateforme de vente
+            </span>
         </div>
         <div class="flex flex-col gap-6 rounded-2xl">
             <FloatLabel variant="on">                                
@@ -185,11 +187,13 @@ import { useAuthStore } from '@/function/stores/auth';
 import { useRouter } from 'vue-router';
 import { usePreloaderSpinner } from '@/function/function/showPreloader';
 import { setSecureItem, getSecureItem, removeSecureItem } from "@/function/stores/secureStorage";
+import { useAuthDialogStore } from '@/function/stores/auth/authDialog'
 import { useAuthCompteStore } from '@/function/stores/auth/compte';
 import { isValidEmail } from '@/function/services/format';
 
 const auth = useAuthStore();
 const authComptes = useAuthCompteStore();
+const authDialog = useAuthDialogStore()
 const preloaderSpinner = usePreloaderSpinner();
 const { showToast, removeAllToasts, removeAllExcept } = useToastAlert();
 
@@ -445,6 +449,7 @@ const connectLoginForm = async () => {
         
             // router.push({ name: 'dashboard' });
             authComptes.hide()
+            authDialog.loginSuccess()
 
         } else if (res.data.info) {
             showToast('info', 'Informations', res.data.message);

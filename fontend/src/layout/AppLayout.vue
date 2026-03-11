@@ -80,7 +80,7 @@
             modal
             :position="dialogUse.position"
             :style="{ width: dialogUse.width }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            :breakpoints="dialogUse.breakpoints" >
             <template #header>
                 <div class="flex items-center gap-2">
                     <Avatar v-if="dialogUse.icon" :icon="dialogUse.icon" class="mr-2" size="large" shape="circle" />
@@ -417,16 +417,22 @@ function bindOutsideClickListener() {
 
 function unbindOutsideClickListener() {
     if (outsideClickListener.value) {
-        document.removeEventListener('click', outsideClickListener);
-        outsideClickListener.value = null;
+        document.removeEventListener('click', outsideClickListener.value)
+        outsideClickListener.value = null
     }
 }
 
 function isOutsideClicked(event) {
-    const sidebarEl = document.querySelector('.layout-sidebar');
-    const topbarEl = document.querySelector('.layout-menu-button');
+    const sidebarEl = document.querySelector('.layout-sidebar')
+    const topbarEl = document.querySelector('.layout-topbar .layout-menu-button')
 
-    return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
+    const clickedSidebar =
+        sidebarEl && (sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target))
+
+    const clickedTopbar =
+        topbarEl && (topbarEl.isSameNode(event.target) || topbarEl.contains(event.target))
+
+    return !(clickedSidebar || clickedTopbar)
 }
 
 router.beforeEach((to, from, next) => {

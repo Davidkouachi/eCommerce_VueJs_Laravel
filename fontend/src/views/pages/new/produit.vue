@@ -9,7 +9,7 @@
             </template>
 
             <template #center>
-                <div class="flex justify-center items-center">
+                <div class="hidden md:flex justify-center items-center">
                     <SelectButton 
                         v-model="layout" 
                         :options="options" 
@@ -112,22 +112,21 @@
                         class="bg-surface-0 dark:bg-surface-700 rounded m-0 p-0"
                         :id="'product-' + item.code">
                         <div class="p-3 border border-surface-0 dark:border-surface-900 bg-surface-0 dark:bg-surface-900 rounded flex flex-col h-full" >
-                            <div class="bg-surface-50 flex justify-center rounded p-0 border-[0.1rem]" @click="goToProduct(item)">
-                                <div class="relative w-full h-55">
+                            <div class="bg-surface-0 flex justify-center rounded p-0">
+                                <div class="relative h-60 overflow-hidden border-[0.1rem] rounded">
                                     <img
                                         :id="`product-image-${item.code}`"
-                                        class="w-full h-full object-cover"
-                                        imageClass="w-full h-full object-cover"
+                                        class="w-full h-full object-cover object-center rounded"
                                         :src="`https://primefaces.org/cdn/primevue/images/product/${item.img}`"
                                         :alt="item.nom"
                                         @click="goToProduct(item)"
                                     />
-                                    <Tag
+                                    <!-- <Tag
                                         v-if="item.qte >= 0"
                                         :value="utilsStore.getStockInfo(item).label"
                                         :class="['absolute border-none !text-white',utilsStore.getStockInfo(item).class]"
                                         style="left: 4px; top: 4px"
-                                    />
+                                    /> -->
                                     <div class="absolute bg-surface-100 p-0 rounded-[5rem]" style="right: 4px; top: 4px">
                                         <div class="flex items-center justify-center gap-2 justify-center py-1 px-2">
                                             <span class="text-surface-900 font-medium text-[0.9rem]">
@@ -136,22 +135,21 @@
                                             <i class="pi pi-star-fill text-yellow-500"></i>
                                         </div>
                                     </div>
-                                    <div class="absolute p-1 rounded-[5rem]"
+                                    <!-- <div class="absolute p-1 rounded-[5rem]"
                                         style="right: 4px; top: 30px"
                                         :class="item.livraison == 1 ? 'bg-green-500' : 'bg-red-500'">
                                         <div class="flex items-center justify-center gap-2 p-1">
                                             <i class="pi pi-truck" :class="item.livraison == 1 ? 'text-white' : 'text-white'"></i>
                                         </div>
+                                    </div> -->
+                                    <div class="absolute flex items-center justify-center w-14 h-14 rounded-full bg-surface-100 border-surface-200"
+                                      style="{right: '4px',bottom: '4px',}" >
+                                        <i class="pi pi-shop font-bold text-surface-0"></i>
                                     </div>
-                                    <div class="absolute flex justify-center w-14 h-14 rounded-full border-[0.1rem]"
-                                      :style="{
-                                        right: '10px',
-                                        bottom: '-25px',
-                                        backgroundImage: `url(https://primefaces.org/cdn/primevue/images/product/${item.img})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
-                                      }"
-                                    >
+                                    <div class="absolute p-1 rounded-full bg-blue-500 w-12 h-12 flex items-center justify-center"
+                                        style="right: 4px; bottom: 4px"
+                                        @click="openDialogBoutique">
+                                            <i class="pi pi-shop font-normal text-surface-0 !text-[2rem]"></i>
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +159,7 @@
                                         <span class="font-medium text-surface-500 dark:text-surface-400 text-sm" >
                                             {{ item.category }}
                                         </span>
-                                        <div class="text-md font-medium mt-1 line-clamp-1 break-words mt-auto">
+                                        <div class="text-md font-medium mt-1 line-clamp-1 break-words ">
                                             {{ item.nom }}
                                         </div>
                                     </div>
@@ -201,7 +199,7 @@
                                 </div>
                             </div>
                             
-                            <div class="flex flex-col flex-1"> 
+                            <div class="flex flex-col flex-1 "> 
                                 <div class="flex flex-col gap-2 mt-auto">
 
                                     <div class="flex flex-col items-start gap-0 mt-0 mb-0">
@@ -228,11 +226,11 @@
                                             @click="goToProduct(item)"
                                         /> -->
                                         <Button
-                                            :icon="favoriteStore.check(item.id) ? 'pi pi-heart-fill' : 'pi pi-heart'"
+                                            :icon="favoriteStore.check(item.code) ? 'pi pi-heart-fill' : 'pi pi-heart'"
                                             variant="outlined"
-                                            :outlined="!favoriteStore.check(item.id)"
+                                            :outlined="!favoriteStore.check(item.code)"
                                             class="favorite-btn"
-                                            @click="favoriteStore.toggle(item.id)"
+                                            @click="favoriteStore.toggle(item.code)"
                                         />
                                     </div>
                                 </div>
@@ -250,19 +248,19 @@
                         :key="index"
                         :id="'product-' + item.code">
                         <div class="flex flex-col md:flex-row md:items-center p-2 gap-4 bg-surface-0 dark:bg-surface-900 rounded my-2" :class="{ 'border-t border-surface': index !== 0 }" @click="goToProduct(item)">
-                            <div class="md:w-40 relative border-[0.1rem]">
+                            <div class="md:w-40 relative border-[0.1rem] rounded">
                                 <img
                                     :id="`product-image-${item.code}`"
                                     class="block xl:block mx-auto rounded w-full" 
                                     :src="`https://primefaces.org/cdn/primevue/images/product/${item.img}`" 
                                     :alt="item.nom" />
-                                <div class="absolute p-1 rounded-[5rem]"
+                                <!-- <div class="absolute p-1 rounded-[5rem]"
                                     style="left: 4px; top: 4px"
                                     :class="item.livraison == 1 ? 'bg-green-500' : 'bg-red-500'">
                                     <div class="flex items-center justify-center gap-2 p-1">
                                         <i class="pi pi-truck" :class="item.livraison == 1 ? 'text-white' : 'text-white'"></i>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-2">
                                 <div class="flex flex-row md:flex-col justify-between items-start gap-1">
@@ -275,14 +273,14 @@
                                             <span class="text-surface-900 font-medium ">{{ item.eval }}</span>
                                             <i class="pi pi-star-fill text-yellow-500"></i>
                                         </div>
-                                        <Tag
+                                        <!-- <Tag
                                             v-if="item.qte >= 0"
                                             :value="utilsStore.getStockInfo(item).label"
                                             :class="[
                                                 'border-none !text-white !text-[0.9rem]',
                                                 utilsStore.getStockInfo(item).class
                                             ]"
-                                        />
+                                        /> -->
                                     </div>
                                 </div>
                                 <div class="flex flex-col md:items-end gap-8">
@@ -321,11 +319,11 @@
                                     </div>
                                     <div class="flex flex-row-reverse md:flex-row gap-2">
                                         <Button
-                                            :icon="favoriteStore.check(item.id) ? 'pi pi-heart-fill' : 'pi pi-heart'"
+                                            :icon="favoriteStore.check(item.code) ? 'pi pi-heart-fill' : 'pi pi-heart'"
                                             variant="outlined"
-                                            :outlined="!favoriteStore.check(item.id)"
+                                            :outlined="!favoriteStore.check(item.code)"
                                             class="favorite-btn"
-                                            @click="favoriteStore.toggle(item.id)"
+                                            @click="favoriteStore.toggle(item.code)"
                                         />
                                         <!-- <Button
                                             label=""
@@ -418,11 +416,15 @@ import { useProductUtilsStore } from '@/function/stores/product/utils'
 import { useFlyingCartStore } from '@/function/stores/product/flyingCart'
 import { useProductListStore } from '@/function/stores/product/productListStore'
 
+import { useAuthDialogStore } from '@/function/stores/auth/authDialog'
+
 import rechOption from './produitRech.vue'
+import dialogBoutique from './dialogBoutique.vue'
 
 const router = useRouter()
 const route = useRoute()
 
+const authDialog = useAuthDialogStore()
 const dialogUse = useDialogStore()
 const favoriteStore = useFavoriteStore()
 const utilsStore = useProductUtilsStore()
@@ -485,7 +487,13 @@ const stockOptions = ref([
    CART ANIMATION
 --------------------------------------------- */
 
-function addToCart(item) {
+async function addToCart(item) {
+
+    const logged = await authDialog.requireLogin()
+
+    if (!logged) {
+        return
+    }
 
     flyingCart.flyToCart(
         `#product-image-${item.code}`,
@@ -664,7 +672,7 @@ const openDialogRech = () => {
         "Filtre",
         null,
         'top',
-        "30rem",
+        "25rem",
         markRaw(rechOption),
         {
 
@@ -703,7 +711,29 @@ const openDialogRech = () => {
             }
 
         },
-        { footerBtn: getFooterButtons() }
+        { footerBtn: getFooterButtons() },
+        {
+            '1199px': '50rem',
+            '575px': '30rem'
+        }
+    )
+
+}
+
+const openDialogBoutique = () => {
+
+    dialogUse.show(
+        'DavCarto',
+        null,
+        'center',
+        "25rem",
+        markRaw(dialogBoutique),
+        {},
+        {},
+        {
+            '1199px': '50rem',
+            '575px': '30rem'
+        }
     )
 
 }
@@ -770,8 +800,26 @@ watch(currentPage, (page) => {
 
 .carousel-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 640px) {
+    .carousel-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .carousel-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .carousel-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
 }
 .carousel-grid > div {
     height: 100%;

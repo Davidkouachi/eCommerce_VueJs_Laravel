@@ -1,7 +1,7 @@
 <template>
     <Fluid>
         <div class="flex flex-col gap-6 p-0 w-full min-w-0">
-            <div>
+            <div class="hidden md:flex flex-col justify-center items-start gap-1">
                 <label class="block mb-2 font-medium">Mode d'affichage</label>
                 <SelectButton 
                     v-model="localLayout" 
@@ -184,8 +184,6 @@ const resetSubmit = () => {
 watch([localMinPrix, localMaxPrix], ([min, max]) => {
     let minVal = Number(min)
     let maxVal = Number(max)
-
-    priceError.value = ''
 
     // Supprimer les zéros initiaux
     if (!isNaN(minVal)) localMinPrix.value = minVal

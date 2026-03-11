@@ -7,6 +7,8 @@ export const useDialogStore = defineStore('dialog', () => {
     const header = ref('Titre');
     const position = ref('top');
     const width = ref('30rem');
+    const breakpoints = ref({}); // 👈 ajouté
+
     const component = ref(null); // 🔥 Le composant à afficher
     const props = ref({}); // 🔥 Les props du composant
     const propsBtnFotter = ref({});
@@ -21,12 +23,14 @@ export const useDialogStore = defineStore('dialog', () => {
         w = '30rem', 
         comp = null, 
         compProps = {}, 
-        footerProps = {} ) {
+        footerProps = {},
+        bp = {} ) {
         loading.value = true;
         header.value = title;
         icon.value = icone;
         position.value = pos;
         width.value = w;
+        breakpoints.value = bp; // 👈
         component.value = comp;
         props.value = compProps;
         propsBtnFotter.value = footerProps;
@@ -38,6 +42,7 @@ export const useDialogStore = defineStore('dialog', () => {
         header.value = 'Titre';
         position.value = 'top';
         width.value = '30rem';
+        breakpoints.value = {}; // 👈 reset
         component.value = null;
         props.value = {};
         propsBtnFotter.value = {};
@@ -67,6 +72,7 @@ export const useDialogStore = defineStore('dialog', () => {
         header,
         position,
         width,
+        breakpoints,
         component,
         props,
         propsBtnFotter,

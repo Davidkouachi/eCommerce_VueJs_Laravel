@@ -15,7 +15,7 @@
             <Button
                 icon="pi pi-arrow-left"
                 label="Retour"
-                severity="danger"
+                severity="secondary"
                 @click="goBack"
             />
             <div class="grid grid-cols-12 gap-6">
@@ -27,12 +27,12 @@
                                 imageClass="w-full h-full object-cover"
                                 :src="slotProps.item.itemImageSrc" 
                                 :alt="slotProps.item.alt">
-                                <Badge
+                                <!-- <Badge
                                     :value="utilsStore.getStockInfo(product).label"
                                     :class="['absolute border-none !text-white',utilsStore.getStockInfo(product).class]"
                                     size="xlarge"
                                     style="left: 10px; top: 10px"
-                                />
+                                /> -->
                             </img>
                         </template>
                         <template #thumbnail="slotProps">
@@ -47,12 +47,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <div class="font-bold text-lg text-surface-500">
-                            #{{ product?.code ?? '-' }}
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <div class="font-normal text-4xl text-surface-700">
+                        <div class="font-normal text-2xl text-surface-700">
                             {{ product?.nom ?? '-' }}
                         </div>
                     </div>
@@ -102,6 +97,9 @@
                         </div>
                     </div> -->
                     <div class="flex flex-row gap-2 items-center">
+                        <div class="font-bold text-xl text-surface-600">
+                            {{ product?.eval ?? '0' }}
+                        </div>
                         <div class="font-normal text-4xl text-surface-800">
                             <div class="flex items-center gap-1">
         
@@ -116,45 +114,119 @@
                                     <!-- demi étoile -->
                                     <i
                                         v-else-if="star === 'half'"
-                                        class="pi pi-star-half text-orange-400 text-xl"
+                                        class="pi pi-star-half-fill text-orange-400 text-xl"
                                     ></i>
 
                                     <!-- étoile vide -->
                                     <i
                                         v-else
-                                        class="pi pi-star text-gray-300 text-xl"
+                                        class="pi pi-star text-gray-500 text-xl"
                                     ></i>
 
                                 </template>
 
                             </div>
                         </div>
-                        <div class="font-bold text-2xl text-orange-400">
-                            {{ product?.eval ?? '0' }}/5
-                        </div>
                         <span class="text-sm text-gray-500">
                             (128 avis)
                         </span>
+                        <Button
+                            :icon="favoriteStore.check(product.code) ? 'pi pi-heart-fill' : 'pi pi-heart'"
+                            variant="outlined"
+                            :outlined="!favoriteStore.check(product.code)"
+                            class="favorite-btn"
+                            @click="favoriteStore.toggle(product.code)"
+                        />
+                    </div>
+                    <div class="flex flex-col gap-2 w-[20rem] my-2">
+                        <Message :severity="stockInfo.severity" variant="outlined">
+                            {{ stockInfo.text }}
+                        </Message>
                     </div>
                     <div class="flex flex-col gap-2 pb-1">
-                        <div class="flex gap-2">
+                        <div class="flex flex-col gap-2 w-full">
+
+                            <!-- Quantité -->
+                            <div class="" style="width: 8rem">
+                                <IftaLabel>
+                                    <InputText
+                                        v-model="qtePanier"
+                                        id="min-price"
+                                        type="number"
+                                        inputmode="numeric"
+                                        class="w-full"
+                                        placeholder="Saisie Obligatoire"
+                                        :disabled="product.qte === 0"
+                                    />
+                                    <label for="min-price">Quantité</label>
+                                </IftaLabel>
+                            </div>
+
+                            <!-- Ajouter -->
                             <Button
-                                :severity="product.qte === 0 ? `danger` : `success`"
-                                :icon="product.qte === 0 ? `pi pi-cart-minus` : `pi pi-shopping-cart`"
-                                :label="product.qte === 0 ? `indisponible` : `Ajouter`"
+                                :severity="product.qte === 0 ? 'danger' : 'success'"
+                                :icon="product.qte === 0 ? 'pi pi-cart-minus' : 'pi pi-shopping-cart'"
+                                :label="product.qte === 0 ? 'Indisponible' : 'Ajouter'"
                                 :disabled="product.qte === 0"
-                                class="flex-auto whitespace-nowrap"
-                            />
-                            <Button
-                                :icon="favoriteStore.check(product.code) ? 'pi pi-heart-fill' : 'pi pi-heart'"
-                                variant="outlined"
-                                :outlined="!favoriteStore.check(product.code)"
-                                class="favorite-btn"
-                                @click="favoriteStore.toggle(product.code)"
+                                class="flex-1 w-[20rem]"
+                                @click="addToCart(prodSlider)"
                             />
                         </div>
                     </div>
-                    <div class="border-t pt-5 pb-5">
+                    <div class="border-t pt-6 pb-5">
+                        <div class="font-bold text-lg text-surface-700 mb-[1rem]">
+                            Partagez ce produit
+                        </div>
+                        <div class="flex flex-row gap-4 items-center justify-start">
+                            <!-- Facebook -->
+                            <a 
+                                :href="`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`" 
+                                target="_blank" 
+                                class="share-icon flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full transition"
+                            >
+                                <i class="pi pi-facebook !text-[1.3rem]"></i>
+                            </a>
+
+                            <!-- Twitter -->
+                            <a 
+                                :href="`https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(product.nom)}`" 
+                                target="_blank" 
+                                class="share-icon flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white rounded-full transition"
+                            >
+                                <i class="pi pi-twitter !text-[1.3rem]"></i>
+                            </a>
+
+                            <!-- WhatsApp -->
+                            <a 
+                                :href="`https://api.whatsapp.com/send?text=${encodeURIComponent(product.nom + ' ' + productUrl)}`" 
+                                target="_blank" 
+                                class="share-icon flex items-center justify-center bg-green-500 hover:bg-green-600 text-white rounded-full transition"
+                            >
+                                <i class="pi pi-whatsapp !text-[1.3rem]"></i>
+                            </a>
+
+                            <!-- Copy Link -->
+                            <button 
+                                @click="copyLink(productUrl)"
+                                class="share-icon flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white rounded-full transition"
+                            >
+                                <i class="pi pi-link !text-[1.3rem]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <Message severity="info">
+                            <template #icon>
+                                <i class="pi pi-info-circle" ></i>
+                            </template>
+                            <span class="ml-2">
+                                Besoin d'aide pour commander ou Signaler des informations incorrectes liées au produit, appelez nous au 25 20 00 61 61
+                            </span>
+                        </Message>
+                    </div>  
+                </div>
+                <div class="col-span-12 gap-2">
+                    <div class="flex flex-col gap-2">
                         <Fieldset>
                             <template #legend>
                                 <div class="flex items-center">
@@ -178,16 +250,6 @@
                             </div>
                         </Fieldset>
                     </div>
-                    <div class="flex flex-col gap-2 ">
-                        <Message severity="info">
-                            <template #icon>
-                                <i class="pi pi-info-circle" ></i>
-                            </template>
-                            <span class="ml-2">
-                                Besoin d'aide pour commander ou Signaler des informations incorrectes liées au produit, appelez nous au 25 20 00 61 61
-                            </span>
-                        </Message>
-                    </div>  
                 </div>
             </div>
         </div>
@@ -222,13 +284,13 @@
                                         :alt="prodSlider.nom"
                                         @click="goToProduct(prodSlider)"
                                     />
-                                    <Tag
+                                    <!-- <Tag
                                         v-if="prodSlider.qte >= 0"
                                         :value="utilsStore.getStockInfo(prodSlider).label"
                                         :class="['absolute border-none !text-white',utilsStore.getStockInfo(prodSlider).class]"
                                         style="left: 4px; top: 4px"
-                                    />
-                                    <div class="absolute bg-surface-100 p-0 rounded-[5rem]" style="right: 4px; top: 4px">
+                                    /> -->
+                                    <div class="absolute bg-surface-100 p-0 rounded-[5rem]" style="right: 4px; bottom: 4px">
                                         <div class="flex items-center justify-center gap-2 justify-center py-1 px-2">
                                             <span class="text-surface-900 font-medium text-[0.9rem]">
                                                 {{ prodSlider.eval }}
@@ -236,13 +298,13 @@
                                             <i class="pi pi-star-fill text-yellow-500"></i>
                                         </div>
                                     </div>
-                                    <div class="absolute p-1 rounded-[5rem]"
+                                    <!-- <div class="absolute p-1 rounded-[5rem]"
                                         style="right: 4px; top: 30px"
                                         :class="prodSlider.livraison == 1 ? 'bg-green-500' : 'bg-red-500'">
                                         <div class="flex items-center justify-center gap-2 p-1">
                                             <i class="pi pi-truck" :class="prodSlider.livraison == 1 ? 'text-white' : 'text-white'"></i>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <!-- <div class="absolute flex justify-center w-14 h-14 rounded-full border-[0.1rem]"
                                       :style="{
                                         right: '10px',
@@ -396,20 +458,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from 'vue-router';
+import { useToastAlert } from '@/function/function/ToastAlert';
 import { ProductService } from '@/service/ProductList';
 import { PhotoService } from '@/service/ProductListDetail';
 import { useFavoriteStore } from '@/function/stores/product/favories';
 import { useProductUtilsStore  } from '@/function/stores/product/utils';
 import { useFlyingCartStore } from '@/function/stores/product/flyingCart'
+import { useAuthDialogStore } from '@/function/stores/auth/authDialog'
 
 const favoriteStore = useFavoriteStore()
 const utilsStore = useProductUtilsStore()
 const flyingCart = useFlyingCartStore()
+const authDialog = useAuthDialogStore()
+const { showToast } = useToastAlert();
 
 const router = useRouter()
 const route = useRoute()
+
+const productUrl = window.location.href;
+
+function copyLink(url) {
+    navigator.clipboard.writeText(url)
+        .then(() => {
+            showToast('info', 'Lien copié', 'URL du produit copiée !');
+        })
+        .catch(() => {
+            toast.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de copier le lien', life: 2000 });
+            showToast('warn', 'Erreur', 'Impossible de copier le lien de ce produit');
+        });
+}
 
 const goToProduct = (product) => {
 
@@ -431,8 +510,53 @@ const loading = ref(true);
 const product = ref(null)
 const images = ref();
 const evaluation = ref(0)
+const qtePanier = ref(1)
 const productSlider = ref([])
 const slider = ref(null)
+
+const stockInfo = computed(() => {
+
+    const qte = product.value?.qte ?? 0
+    const limit = product.value?.qteLimit ?? 0
+
+    switch (true) {
+
+        // 🔴 Rupture de stock
+        case qte === 0:
+            return {
+                class: 'bg-surface-500 text-center',
+                icon: '❌',
+                text: 'Produit en rupture de stock',
+                severity: 'error',
+            }
+
+        // 🟠 Stock faible
+        case qte > 0 && qte <= limit:
+            return {
+                class: 'stock bg-orange-500 text-center',
+                icon: '⚠',
+                text: `Dépêchez-vous ! Il reste seulement ${qte}`,
+                severity: 'warn',
+            }
+
+        // 🟢 Stock disponible
+        case qte > limit:
+            return {
+                class: 'stock bg-green-500 text-center',
+                icon: '✅',
+                text: `Produit disponible ( ${qte} en stock )`,
+                severity: 'success',
+            }
+
+        default:
+            return {
+                class: 'stock-ok',
+                icon: '',
+                text: '',
+                severity: 'contrast',
+            }
+    }
+})
 
 const stars = computed(() => {
     const rating = evaluation.value
@@ -531,8 +655,12 @@ const responsiveOptions = ref([
         numVisible: 4
     },
     {
+        breakpoint: '600px',
+        numVisible: 3
+    },
+    {
         breakpoint: '575px',
-        numVisible: 1
+        numVisible: 2
     }
 ]);
 
@@ -550,12 +678,20 @@ function scrollRight() {
     })
 }
 
-function addToCart(item) {
+async function addToCart(item) {
+
+    const logged = await authDialog.requireLogin()
+
+    if (!logged) {
+        return
+    }
+
     flyingCart.flyToCart(
         `#product-image-${item.code}`,
         '#global-cart-icon',
         { startSize: 50, endSize: 20 }
     )
+
 }
 
 const getSeverity = (status) => {
@@ -603,9 +739,22 @@ onMounted(() => {
   loadProduct()
 })
 
+watch([qtePanier], ([qte]) => {
+    let val = Number(qte)
+
+    // Supprimer les zéros initiaux
+    if (!isNaN(val)) qtePanier.value = val
+
+    if (val > product.value.qte) {
+        showToast('warn', 'Attention', 'La quantité saisie ne doit pas dépasser le stock restant');
+        qtePanier.value = product.value.qte
+    } 
+})
+
 </script>
 
 <style >
+
 .carousel-slider {
     display: flex;
     overflow-x: auto;
@@ -618,6 +767,8 @@ onMounted(() => {
     display: none;
 }
 
+/*_____________________________________________ */
+
 .product-card {
     flex: 0 0 220px;
     scroll-snap-align: start;
@@ -626,6 +777,7 @@ onMounted(() => {
     padding: 1rem;
 }
 
+/*_____________________________________________ */
 
 .nav-btn {
     position: absolute;
@@ -644,5 +796,40 @@ onMounted(() => {
 
 .nav-btn.right {
     right: -10px;
+}
+
+/*_____________________________________________ */
+
+/* animation clignotement */
+@keyframes blink {
+  0% { transform: scale(1) }
+  50% { transform: scale(1.05) }
+  100% { transform: scale(1) }
+} 
+
+/* animation pulse */
+@keyframes pulse {
+  0% { transform: scale(1) }
+  50% { transform: scale(1.05) }
+  100% { transform: scale(1) }
+} 
+
+.stock{
+    animation: pulse 2s infinite;
+}
+
+/*_____________________________________________ */
+
+.share-icon {
+    width: 2.7rem;   /* largeur fixe pour tous les boutons */
+    height: 2.7rem;  /* hauteur fixe */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.share-icon:hover {
+    transform: scale(1.1);  /* léger zoom au hover */
 }
 </style>
