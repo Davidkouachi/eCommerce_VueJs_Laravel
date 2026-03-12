@@ -136,7 +136,7 @@ const props = defineProps({
     livraisonOptions: Function,
     stockOptions: Function,
     applyFilters: Function,
-    reloadloadProducts: Function,
+    reloadProducts: Function,
 })
 
 const dialogUse = useDialogStore();
@@ -176,7 +176,7 @@ const resetSubmit = () => {
     localMinPrix.value = 0
     localMaxPrix.value = 1000000
 
-    props.reloadloadProducts?.()
+    props.reloadProducts?.()
     dialogUse.hide()
 }
 

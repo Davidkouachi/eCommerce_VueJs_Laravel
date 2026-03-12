@@ -149,8 +149,8 @@
                                     <div class="absolute p-1 rounded-full bg-blue-500 w-12 h-12 flex items-center justify-center"
                                         style="right: 4px; bottom: 4px"
                                         @click="openDialogBoutique">
-                                            <i class="pi pi-shop font-normal text-surface-0 !text-[2rem]"></i>
-                                    </div>
+                                            <i class="pi pi-shop text-surface-0 !text-[1.5rem]"></i>
+                                    </div>      
                                 </div>
                             </div>
                             <div class="pt-6 flex flex-col flex-1" @click="goToProduct(item)">
@@ -708,7 +708,9 @@ const openDialogRech = () => {
 
                 loadProducts(1)
 
-            }
+            },
+            
+            reloadProducts
 
         },
         { footerBtn: getFooterButtons() },

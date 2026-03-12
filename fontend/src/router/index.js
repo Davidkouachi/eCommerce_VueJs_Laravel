@@ -22,6 +22,7 @@ const customPages = [
     { path: '/element_carte', name: 'element_carte', component: () => import('@/views/pages/new/carte.vue'), meta: { title: 'Carte', requiresAuth: true } },
     { path: '/', name: 'element_produit', component: () => import('@/views/pages/new/produit.vue'), meta: { title: 'Produit' } },
     { path: '/element_produit_detail/:code', name: 'element_produit_detail', component: () => import('@/views/pages/new/produitDetail.vue'), meta: { title: 'Détail Produit' } },
+    { path: '/element_mescomandes/', name: 'element_mescomandes', component: () => import('@/views/pages/new/mescomandes.vue'), meta: { title: 'Mes Commandes', requiresAuth: true } },
 
 ];
 
@@ -100,7 +101,7 @@ const routes = [
         path: '/maintenance',
         name: 'Maintenance',
         component: () => import('@/views/Maintenance.vue'),
-        meta: { title: 'Maintenance', requiresAuth: true }
+        meta: { title: 'Maintenance' }
     },
 
     {
@@ -132,14 +133,14 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // // Rediriger vers Home si déjà connecté et tente d’aller sur login
-    if (to.name === 'Authentification' && auth.isAuthenticated) {
-        return next({ name: 'dashboard' });
-    }
+    // if (to.name === 'Authentification' && auth.isAuthenticated) {
+    //     return next({ name: 'element_produit' });
+    // }
 
     // // Protéger les routes nécessitant l’auth
     if (to.meta?.requiresAuth && !auth.isAuthenticated) {
         auth.logoutLocal(true);
-        return next({ name: 'Authentification' });
+        return next({ name: 'element_produit' });
     }
 
     // Mettre à jour le titre de la page

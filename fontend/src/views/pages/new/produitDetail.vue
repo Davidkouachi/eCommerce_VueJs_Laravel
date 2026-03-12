@@ -9,7 +9,7 @@
             Chargement en cours ...
         </div>
     </div>
-    <div v-else >
+    <div v-else class="" >
         <!-- Informations principales -->
         <div class="card rounded">
             <Button
@@ -19,28 +19,67 @@
                 @click="goBack"
             />
             <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-6 p-2 flex flex-col gap-2">
-                    <Galleria :value="images" :responsiveOptions="responsiveOptions" :numVisible="5" containerStyle="max-width: 100%">
+                <div class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-8 xl:col-span-8 p-2 flex flex-col gap-2">
+                    <!-- <Galleria :value="images" :responsiveOptions="responsiveOptions" :numVisible="5" containerStyle="max-width: 100%">
                         <template #item="slotProps">
                             <img
                                 class="relative w-full h-full object-cover"
-                                imageClass="w-full h-full object-cover"
                                 :src="slotProps.item.itemImageSrc" 
                                 :alt="slotProps.item.alt">
-                                <!-- <Badge
+                                <Badge
                                     :value="utilsStore.getStockInfo(product).label"
                                     :class="['absolute border-none !text-white',utilsStore.getStockInfo(product).class]"
                                     size="xlarge"
                                     style="left: 10px; top: 10px"
-                                /> -->
+                                />
                             </img>
                         </template>
                         <template #thumbnail="slotProps">
                             <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" />
                         </template>
+                    </Galleria> -->
+                    <Galleria
+                        :value="images"
+                        :responsiveOptions="responsiveOptions"
+                        :numVisible="5"
+                        containerStyle="max-width: 100%"
+                        :circular="true"
+                        :autoPlay="true" 
+                        :transitionInterval="2000"
+                        :showItemNavigators="false"
+                        :showThumbnails="true"
+                    >
+                        
+                        <template #item="slotProps">
+                            <div class="flex items-center justify-center w-full h-[30rem]">
+                                <Image
+                                    :src="slotProps.item.itemImageSrc"
+                                    :alt="slotProps.item.alt"
+                                    imageClass="h-auto w-auto object-contain mx-auto"
+                                    preview
+                                />
+                            </div>
+                        </template>
+                        
+                        <template #thumbnail="slotProps">
+                            <div class="flex items-center justify-center w-[70px] h-[70px] p-1">
+                                <img
+                                    :src="slotProps.item.thumbnailImageSrc"
+                                    :alt="slotProps.item.alt"
+                                    class="max-w-full max-h-full object-contain rounded border border-surface-200"
+                                />
+                            </div>
+                        </template>
+
+                        <template #caption="slotProps">
+                            <div class="text-xl mb-2 font-bold">{{ slotProps.item.title }}</div>
+                            <p class="text-white">{{ slotProps.item.alt }}</p>
+                        </template>
+
                     </Galleria>
                 </div>
-                <div class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-6 p-2 flex flex-col gap-2">
+                <div class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-4 xl:col-span-4 p-2 flex flex-col gap-2">
+
                     <div class="flex flex-col gap-2">
                         <div class="font-bold text-md text-surface-500">
                             {{ product?.category ?? '-' }}
@@ -87,19 +126,7 @@
 
                         </div>
                     </div>
-                    <!-- <div class="flex flex-col gap-2 pb-1">
-                        <div class="font-normal text-4xl text-surface-800">
-                            <Badge
-                                :value="utilsStore.getStockInfo(product).label"
-                                :class="['border-none !text-white',utilsStore.getStockInfo(product).class]"
-                                size="xlarge"
-                            />
-                        </div>
-                    </div> -->
                     <div class="flex flex-row gap-2 items-center">
-                        <div class="font-bold text-xl text-surface-600">
-                            {{ product?.eval ?? '0' }}
-                        </div>
                         <div class="font-normal text-4xl text-surface-800">
                             <div class="flex items-center gap-1">
         
@@ -127,7 +154,10 @@
 
                             </div>
                         </div>
-                        <span class="text-sm text-gray-500">
+                        <div class="font-bold text-[1.3rem] text-surface-600">
+                            {{ product?.eval ?? '0' }}
+                        </div>
+                        <span class="text-[1rem] text-gray-500 mx-5">
                             (128 avis)
                         </span>
                         <Button
@@ -143,12 +173,12 @@
                             {{ stockInfo.text }}
                         </Message>
                     </div>
-                    <div class="flex flex-col gap-2 pb-1">
+                    <div class="flex flex-col gap-2 pb-1 border-b pb-6">
                         <div class="flex flex-col gap-2 w-full">
 
                             <!-- Quantité -->
-                            <div class="" style="width: 8rem">
-                                <IftaLabel>
+                            <div class="flex flex-col gap-2" >
+                                <IftaLabel style="width: 8rem" >
                                     <InputText
                                         v-model="qtePanier"
                                         id="min-price"
@@ -160,20 +190,34 @@
                                     />
                                     <label for="min-price">Quantité</label>
                                 </IftaLabel>
+                                <span v-if="errorQte" class="text-[1rem] text-red-500">
+                                    {{ errorQte }}
+                                </span>
                             </div>
 
                             <!-- Ajouter -->
                             <Button
                                 :severity="product.qte === 0 ? 'danger' : 'success'"
                                 :icon="product.qte === 0 ? 'pi pi-cart-minus' : 'pi pi-shopping-cart'"
-                                :label="product.qte === 0 ? 'Indisponible' : 'Ajouter'"
+                                iconPos="right"
+                                :label="product.qte === 0 ? 'Indisponible' : 'Ajouter au panier'"
                                 :disabled="product.qte === 0"
+                                class="flex-1 w-[20rem]"
+                                @click="addToCart(prodSlider)"
+                            />
+                            <Button
+                                v-if="product.qte > 0"
+                                severity="warn"
+                                icon="pi pi-cart-arrow-down"
+                                iconPos="right"
+                                label="Acheter maintenant"
                                 class="flex-1 w-[20rem]"
                                 @click="addToCart(prodSlider)"
                             />
                         </div>
                     </div>
-                    <div class="border-t pt-6 pb-5">
+
+                    <div class="mb-3">
                         <div class="font-bold text-lg text-surface-700 mb-[1rem]">
                             Partagez ce produit
                         </div>
@@ -214,6 +258,9 @@
                             </button>
                         </div>
                     </div>
+                    <div class="flex flex-col gap-2 mb-3">
+                        <Button icon="pi pi-exclamation-triangle" class="flex-1 w-[20rem]" label="Signaler la boutique" severity="danger" raised />
+                    </div> 
                     <div class="flex flex-col gap-2">
                         <Message severity="info">
                             <template #icon>
@@ -223,32 +270,60 @@
                                 Besoin d'aide pour commander ou Signaler des informations incorrectes liées au produit, appelez nous au 25 20 00 61 61
                             </span>
                         </Message>
-                    </div>  
+                    </div>
                 </div>
                 <div class="col-span-12 gap-2">
-                    <div class="flex flex-col gap-2">
-                        <Fieldset>
-                            <template #legend>
-                                <div class="flex items-center">
-                                    <span class="font-bold p-2">A savoir</span>
-                                </div>
-                            </template>
-                            <div class="text-surface-800 flex items-left m-0">
-                                <ul class="m-0 list-none surface rounded p-0 flex flex-col gap-1 w-full">
-                                    <li
-                                        v-for="item in desc"
-                                        class="p-2 rounded transition-all duration-200 flex items-center justify-content-between" >
+                    <div class="flex flex-col md:flex-row items-stretch gap-4">
+                        <div class="w-full" >
+                            <Fieldset class="h-full">
+                                <template #legend>
+                                    <div class="flex items-center">
+                                        <span class="font-bold p-2">
+                                            Caractéristiques
+                                        </span>
+                                    </div>
+                                </template>
+                                <div class="text-surface-800 flex items-left m-0 p-0">
+                                    <ul class="m-0 list-none surface rounded p-0 flex flex-col gap-1 w-full">
+                                        <li
+                                            v-for="item in critere"
+                                            class="p-1 rounded transition-all duration-200 flex items-center justify-content-between" >
 
-                                        <div class="flex flex-1 items-center gap-2">
-                                            <span class="flex w-8 h-8 items-center justify-center text-white rounded-full z-10 shadow-sm" :style="{ backgroundColor: item.color }">
-                                                <i :class="item.icon"></i>
-                                            </span>
-                                            <span class="font-bold">{{ item.label }}</span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </Fieldset>
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex shrink-0 w-4 h-4 items-center justify-center text-white rounded-full z-10 shadow-sm" :style="{ backgroundColor: item.color }">
+                                                    <!-- <i :class="item.icon"></i> -->
+                                                </span>
+                                                <span class="font-bold">{{ item.label }}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </Fieldset>
+                        </div>
+                        <div class="w-full" >
+                            <Fieldset class="h-full">
+                                <template #legend>
+                                    <div class="flex items-center">
+                                        <span class="font-bold p-2">A savoir</span>
+                                    </div>
+                                </template>
+                                <div class="text-surface-800 flex items-left m-0 p-0">
+                                    <ul class="m-0 list-none surface rounded p-0 flex flex-col gap-1 w-full">
+                                        <li
+                                            v-for="item in desc"
+                                            class="p-1 rounded transition-all duration-200 flex items-center justify-content-between" >
+
+                                            <div class="flex items-start gap-2">
+                                                <span class="flex shrink-0 w-4 h-4 items-center justify-center text-white rounded-full z-10 shadow-sm" :style="{ backgroundColor: item.color }">
+                                                    <!-- <i :class="item.icon"></i> -->
+                                                </span>
+                                                <span class="font-bold">{{ item.label }}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </Fieldset>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -415,7 +490,7 @@
             <div class="flex flex-col gap-4">
                 <div class="flex justify-center items-center mb-4">
                     <div class="font-bold text-4xl text-surface-700">
-                        Chers clients
+                        Avis aux clients
                     </div>
                 </div>
 
@@ -511,6 +586,7 @@ const product = ref(null)
 const images = ref();
 const evaluation = ref(0)
 const qtePanier = ref(1)
+const errorQte = ref('')
 const productSlider = ref([])
 const slider = ref(null)
 
@@ -575,6 +651,31 @@ const stars = computed(() => {
     return result
 })
 
+const critere = ref([
+    
+    { 
+        label: 'Produit authentique garanti', 
+        icon: 'pi pi-check-circle',
+        color: 'blue'
+    },
+    { 
+        label: 'Garantie 12 mois', 
+        icon: 'pi pi-shield',
+        color: 'blue'
+    },
+    { 
+        label: 'Connectivité double appareil', 
+        icon: 'pi pi-shield',
+        color: 'blue'
+    },
+    { 
+        label: 'annulation de bruit', 
+        icon: 'pi pi-shield',
+        color: 'blue'
+    },
+    
+])
+
 const desc = ref([
     { 
         label: product?.livraison === 1 
@@ -586,8 +687,23 @@ const desc = ref([
     { 
         label: 'Livraison rapide garantie sous 3 jours ouvrables', 
         icon: 'pi pi-truck',
-        color: 'gray'
-    }
+        color: 'green'
+    },
+    { 
+        label: 'Retour possible sous 7 jours', 
+        icon: 'pi pi-refresh',
+        color: 'green'
+    },
+    { 
+        label: 'Produit en stock', 
+        icon: 'pi pi-box',
+        color: 'green'
+    },
+    { 
+        label: 'Paiement sécurisé', 
+        icon: 'pi pi-lock',
+        color: 'green'
+    },
 ])
 
 const consignes = ref([
@@ -746,7 +862,8 @@ watch([qtePanier], ([qte]) => {
     if (!isNaN(val)) qtePanier.value = val
 
     if (val > product.value.qte) {
-        showToast('warn', 'Attention', 'La quantité saisie ne doit pas dépasser le stock restant');
+        // showToast('warn', 'Attention', 'La quantité saisie ne doit pas dépasser le stock restant');
+        errorQte.value = 'La quantité saisie ne doit pas dépasser le stock restant'
         qtePanier.value = product.value.qte
     } 
 })

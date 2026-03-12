@@ -1,13 +1,5 @@
 <template>
     <div class="layout-sidebar">
-        <div class="my-6 mx-5 flex items-center justify-left">
-            <router-link to="/" class="flex flex-col items-center gap-3 min-w-0 w-full">
-                <img src="@/assets/img/logo.png" class="w-[3rem] shrink-0" alt="Logo">
-                <span class="text-base font-bold break-words text-center">
-                    Centre Médical la Nouvelle Amitié de Yamoussoukro
-                </span>
-            </router-link>
-        </div>
         <div class="layoutSidebar">
             <app-menu></app-menu>
             <div class="card mt-6 border border-3 border-primary !bg-surface-800 mx-4" >

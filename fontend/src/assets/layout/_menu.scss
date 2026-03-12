@@ -3,30 +3,23 @@
 .layout-sidebar {
     position: fixed;
     width: 20rem;
-    height: calc(100vh - 0rem);
+    height: calc(100vh - 8rem);
     z-index: 999;
+    overflow-y: auto;
     user-select: none;
-    top: 0rem;
-    left: 0rem;
+    top: 6rem;
+    left: 2rem;
     transition:
         transform var(--layout-section-transition-duration),
         left var(--layout-section-transition-duration);
     background-color: var(--surface-overlay);
-    border-radius: 0;
-    padding: 0rem 0rem 1rem 0rem;
-
-    display: flex;
-    flex-direction: column;
-
-    .layoutSidebar {
-        overflow-y: auto;
-        flex: 1;
-    }
+    border-radius: var(--content-border-radius);
+    padding: 0.5rem 1.5rem;
 }
 
 .layout-menu {
     margin: 0;
-    padding: 0rem 1.5rem 0rem 1.5rem;
+    padding: 0;
     list-style-type: none;
 
     .layout-root-menuitem {

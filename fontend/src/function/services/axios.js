@@ -2,10 +2,10 @@ import axios from "axios";
 import { useAuthStore } from "@/function/stores/auth";
 import { getSecureItem } from "@/function/stores/secureStorage";
 
-// axios.defaults.baseURL = "http://192.168.1.64:8000";
+axios.defaults.baseURL = "http://192.168.1.64:8000";
 // axios.defaults.baseURL = "http://192.168.1.65:8000";
 // axios.defaults.baseURL = "http://192.168.1.66:8000";
-axios.defaults.baseURL = "http://127.0.0.1:8000";
+// axios.defaults.baseURL = "http://127.0.0.1:8000";
 axios.defaults.headers.common["Accept"] = "application/json";
 
 let isRefreshing = false;

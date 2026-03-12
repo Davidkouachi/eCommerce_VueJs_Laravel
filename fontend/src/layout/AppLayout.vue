@@ -190,9 +190,9 @@
                 </div>
             </template>
         </Drawer>
+        <app-topbar ></app-topbar>
         <app-sidebar ></app-sidebar>
         <div class="layout-main-container" >
-            <app-topbar ></app-topbar>
             <div class="layout-main">
                 <div v-if="preloader.loading" class="cardPreloader" style="position: relative; min-height: 70vh;">
                     <!-- Preloader -->
@@ -238,7 +238,7 @@ import { useLayout } from '@/layout/composables/layout';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
-import { computed, ref, watch, onMounted, nextTick, watchEffect } from 'vue';
+import { computed, ref, watch, onMounted, onUnmounted, nextTick, watchEffect } from 'vue';
 import { useAuthStore } from '@/function/stores/auth';
 import { useSwalAlert } from '@/function/function/SwalAlert';
 import { usePreloaderStore } from '@/function/stores/preloader';
@@ -365,7 +365,8 @@ const containerClass = computed(() => {
         auth.user && ['administrateur', 'user'].includes(auth.user.role);
 
     // Déterminer le mode de menu à appliquer
-    const menuMode = isAuthorized ? 'static' : 'overlay';
+    // const menuMode = isAuthorized ? 'static' : 'overlay';
+    const menuMode = 'overlay';
 
     return {
         'layout-overlay': menuMode === 'overlay',
@@ -572,6 +573,21 @@ watch(() => route.path, (newPath) => {
     },
     { immediate: true }
 );
+
+
+// logique pour fermer le menu sous l'icone user dans le top bar 
+const closeUserMenu = () => {
+    const panel = document.getElementById('user-menu-panel')
+    if (panel) {
+        panel.classList.add('hidden')
+    }
+}
+onMounted(() => {
+    window.addEventListener('close-topbar-menu', closeUserMenu)
+})
+onUnmounted(() => {
+    window.removeEventListener('close-topbar-menu', closeUserMenu)
+})
 
 </script>
 

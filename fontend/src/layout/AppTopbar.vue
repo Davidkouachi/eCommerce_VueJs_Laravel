@@ -1,6 +1,6 @@
 <template>
     <div class="layout-topbar">
-        <div class="layout-topbar-logo-container">
+        <div class="layout-topbar-logo-container items-center">
             <button
                 v-if="auth.isAuthenticated && ['administrateur', 'user'].includes(auth.user.role)"
                 class="layout-menu-button layout-topbar-action"
@@ -58,6 +58,7 @@
                 </button>
 
                 <div
+                    id="user-menu-panel"
                     class="config-panel hidden absolute top-[3.25rem] right-0 w-64 p-0 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]"
                 >
                     <div class="flex justify-center border-0">
@@ -88,7 +89,12 @@
                                     <span class="text-primary font-bold">{{ item.label }}</span>
                                 </template>
                                 <template #item="{ item, props }">
-                                    <a v-ripple class="flex items-center" v-bind="props.action" :id="item.id" @click="handleItemClick(item)">
+                                    <a 
+                                        v-ripple 
+                                        class="flex items-center" 
+                                        v-bind="props.action" 
+                                        :id="item.id" 
+                                        @click="handleItemClick(item)">
                                         <span :class="item.icon" />
                                         <span>{{ item.label }}</span>
                                         <Badge v-if="item.badge" class="ml-auto" :value="item.badge" />
@@ -107,6 +113,7 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed, onMounted, defineComponent, markRaw } from "vue";
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/function/stores/auth';
 import { useDrawerStore } from '@/function/stores/drawer';
 import { usePreloaderSpinner } from '@/function/function/showPreloader';
@@ -129,6 +136,9 @@ const breadcrumbMenu = useBreadcrumbMenuStore();
 const authComptes = useAuthCompteStore();
 const authDialog = useAuthDialogStore()
 
+const router = useRouter()
+const route = useRoute()
+
 const itemsConnecter = computed(() => {
     const menu = [
         {
@@ -145,6 +155,11 @@ const itemsConnecter = computed(() => {
                     label: 'Vos commandes',
                     icon: 'pi pi-shopping-bag',
                     badge: 2,
+                    command: () => {
+                        router.push({
+                            name: 'element_mescomandes',
+                        })
+                    }
                 },
                 {
                     label: 'Favoris',
@@ -276,6 +291,9 @@ function showNotifications() {
 }
 
 function handleItemClick (item, position = 'center') {
+    // envoyer un événement global pour fermer le menu
+    window.dispatchEvent(new Event('close-topbar-menu'))
+    
     if (item.id === "logout") {
         confirm.require({
             // group: 'positioned',

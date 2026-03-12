@@ -2,14 +2,14 @@ export const PhotoService = {
         getData() {
             return [
                 {
-                    itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-                    thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
+                    itemImageSrc: 'https://primefaces.org/cdn/primevue/images/product/bamboo-watch.jpg',
+                    thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/product/bamboo-watch.jpg',
                     alt: 'Description for Image 1',
                     title: 'Title 1'
                 },
                 {
-                    itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
-                    thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
+                    itemImageSrc: 'https://primefaces.org/cdn/primevue/images/product/black-watch.jpg',
+                    thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/product/black-watch.jpg',
                     alt: 'Description for Image 2',
                     title: 'Title 2'
                 },
