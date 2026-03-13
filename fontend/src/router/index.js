@@ -83,6 +83,18 @@ const pgsPagesConfiguration = [
     },
 ];
 
+const boutiquePages = [
+    { 
+        path: '/Categories', 
+        name: 'categories', 
+        component: () => import('@/views/pages/boutique/categories/index.vue'), 
+        meta: { 
+            title: 'Categories', 
+            requiresAuth: true 
+        } 
+    },
+];
+
 // Routes principales
 const routes = [
     {
@@ -91,7 +103,7 @@ const routes = [
         children: [
             ...corePages,
             ...customPages,
-
+            ...boutiquePages,
             ...pgsPagesAdministration,
             ...pgsPagesConfiguration,
         ]

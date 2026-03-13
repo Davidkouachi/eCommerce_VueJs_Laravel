@@ -190,8 +190,10 @@ import { setSecureItem, getSecureItem, removeSecureItem } from "@/function/store
 import { useAuthDialogStore } from '@/function/stores/auth/authDialog'
 import { useAuthCompteStore } from '@/function/stores/auth/compte';
 import { isValidEmail } from '@/function/services/format';
+import { useDeviceStore } from "@/function/stores/deviceStore";
 
 const auth = useAuthStore();
+const deviceStore = useDeviceStore();
 const authComptes = useAuthCompteStore();
 const authDialog = useAuthDialogStore()
 const preloaderSpinner = usePreloaderSpinner();
@@ -385,28 +387,8 @@ async function resendCode() {
   
 }
 
-function getDeviceId() {
-    let id = getSecureItem("device_id");
-
-    if (!id) {
-        if (crypto.randomUUID) {
-            id = crypto.randomUUID();
-        } else {
-            // Polyfill compatible
-            id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-                const r = (Math.random() * 16) | 0;
-                const v = c === 'x' ? r : (r & 0x3) | 0x8;
-                return v.toString(16);
-            });
-        }
-        setSecureItem("device_id", id);
-    }
-
-    return id;
-}
-
 // usage
-const deviceId = getDeviceId();
+const deviceId = deviceStore.getDeviceId();
 
 const connectLoginForm = async () => {
     if (submitting) return;   // 🔥 empêche 100% des doubles appels
@@ -471,14 +453,14 @@ const connectLoginForm = async () => {
 
 onMounted(() => {
 
-    removeSecureItem("jwt_token");
-    removeSecureItem("refresh_token");
-    removeSecureItem("session_expire");
-    removeSecureItem("session_expired");
-    removeSecureItem("device_id");
-    removeSecureItem("aL");
-    removeSecureItem("nu");
-    removeSecureItem("me");
+    // removeSecureItem("jwt_token");
+    // removeSecureItem("refresh_token");
+    // removeSecureItem("session_expire");
+    // removeSecureItem("session_expired");
+    // removeSecureItem("device_id");
+    // removeSecureItem("aL");
+    // removeSecureItem("nu");
+    // removeSecureItem("me");
 })
 
 watch(() => activeStep.value, (newStep) => {

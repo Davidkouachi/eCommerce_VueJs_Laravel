@@ -7,11 +7,11 @@
                     <div class="col-span-12 flex items-center justify-center" >
                         <img src="@/assets/img/version.png" class="w-[5rem] shrink-0" alt="Logo">
                     </div>
-                    <div class="col-span-12 flex items-center justify-center" >
+                    <!-- <div class="col-span-12 flex items-center justify-center" >
                         <span class="text-base font-bold break-words text-center text-white">
-                            Espace Santé
+                            
                         </span>
-                    </div>
+                    </div> -->
                     <div class="col-span-12 flex items-center justify-center" >
                         <Chip label="Version 1.0.0" icon="pi pi-cog" size="small"/>
                     </div>

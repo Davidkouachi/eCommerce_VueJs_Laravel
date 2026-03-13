@@ -12,9 +12,13 @@ use App\Http\Controllers\AssuranceController;
 // Routes publiques
 Route::post('/login', [AuthController::class, 'traitement_login']);
 
+Route::middleware('auth:api')->get('/me', [AuthController::class, 'me']);
+Route::post('/refresh', [AuthController::class, 'refreshToken']);
+Route::post('/logout', [AuthController::class, 'logout']);
+
 // Routes protégées par JWT
 Route::middleware('auth:api')->group(function () {
-    Route::post('/refresh', [AuthController::class, 'refreshToken']);
+    // Route::post('/refresh', [AuthController::class, 'refreshToken']);
 
     Route::post('/register', [AuthController::class, 'traitement_registre']);
 
@@ -31,7 +35,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/deleteUser/{id}', [AuthController::class, 'deleteUser']);
 
     // Déconnexion
-    Route::post('/logout', [AuthController::class, 'logout']);
+    // Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 $prefix = "v1";

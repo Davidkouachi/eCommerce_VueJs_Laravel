@@ -32,7 +32,7 @@
             </template>
         </ConfirmDialog>
         <!-- afficher modal pour session expirer -->
-        <Dialog :dismissableMask="false" :visible="visibleAuth" pt:root:class="!border-0 !bg-transparent" pt:mask:class="backdrop-blur-sm bg-black/50 !pointer-events-auto">
+        <Dialog appendTo="body" :dismissableMask="false" :visible="visibleAuth" pt:root:class="!border-0 !bg-transparent" pt:mask:class="backdrop-blur-sm bg-black/50 !pointer-events-auto">
             <template #container="{ closeCallback }">
                 <div style="border-radius: 10px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color), rgba(33, 150, 243, 0) 30%)" >
                     <div class="w-[25rem] bg-surface-0 dark:bg-surface-900 py-10 px-2 sm:px-5" style="border-radius: 7px">
@@ -76,6 +76,7 @@
         </Dialog>
         <!-- afficher modal pour les recherches produit -->
         <Dialog 
+            appendTo="body"
             v-model:visible="dialogUse.loading"
             modal
             :position="dialogUse.position"
@@ -115,6 +116,7 @@
         </Dialog>
         <!-- afficher modal pour les authentification -->
         <Dialog 
+            appendTo="body"
             v-model:visible="authComptes.loading"
             modal
             :dismissableMask="false"
@@ -154,6 +156,7 @@
             </template>
         </Dialog>
         <Drawer
+            appendTo="body"
             v-model:visible="drawerUse.loading"
             :position="drawerUse.position"
             :dismissableMask="false"
@@ -360,21 +363,26 @@ const verifLoginForm = async () => {
 // });
 
 const containerClass = computed(() => {
-    // Vérifier si l'utilisateur est connecté et rôle autorisé
-    const isAuthorized =
-        auth.user && ['administrateur', 'user'].includes(auth.user.role);
 
-    // Déterminer le mode de menu à appliquer
-    // const menuMode = isAuthorized ? 'static' : 'overlay';
-    const menuMode = 'overlay';
+    const isAuthorized =
+        auth.user && ['administrateur'].includes(auth.user.role);
+
+    const menuMode = isAuthorized ? 'static' : 'overlay';
 
     return {
         'layout-overlay': menuMode === 'overlay',
         'layout-static': menuMode === 'static',
+
         'layout-static-inactive':
-            layoutState.staticMenuDesktopInactive && menuMode === 'static',
-        'layout-overlay-active': layoutState.overlayMenuActive,
-        'layout-mobile-active': layoutState.staticMenuMobileActive,
+            layoutState.staticMenuDesktopInactive &&
+            menuMode === 'static' &&
+            isAuthorized,
+
+        'layout-overlay-active':
+            layoutState.overlayMenuActive &&
+            !isAuthorized,
+
+        'layout-mobile-active': layoutState.staticMenuMobileActive
     };
 });
 

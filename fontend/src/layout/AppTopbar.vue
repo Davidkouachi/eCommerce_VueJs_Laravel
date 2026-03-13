@@ -2,15 +2,15 @@
     <div class="layout-topbar">
         <div class="layout-topbar-logo-container items-center">
             <button
-                v-if="auth.isAuthenticated && ['administrateur', 'user'].includes(auth.user.role)"
+                v-if="auth.isAuthenticated && ['administrateur'].includes(auth.user.role)"
                 class="layout-menu-button layout-topbar-action"
                 @click="toggleMenu"
             >
               <i class="pi pi-bars"></i>
             </button>
-            <div class="mt-0 flex items-center left-0 gap-2">
+            <div class="mt-0 flex items-start left-0 gap-2 ">
                 <router-link to="/" class="layout-topbar-logo xl:hidden">
-                    <img src="@/assets/img/logo.jpg" class="w-[8.5rem] shrink-0" alt="Logo">
+                    <img src="@/assets/img/logo.jpg" class="w-[8rem] shrink-0" alt="Logo">
                 </router-link>
                 <!-- <span class="font-semibold text-[1.5rem]" v-if="breadcrumbMenu.items.length">
                     {{ breadcrumbMenu.items[breadcrumbMenu.items.length - 1].label }}
@@ -63,7 +63,7 @@
                 >
                     <div class="flex justify-center border-0">
                         <template v-if="!auth.isAuthenticated" >
-                            <Menu :model="itemsNonConnecter" class="w-full">
+                            <Menu :model="itemsNonConnecter" class="w-full" appendTo="body">
                                 <template #item="{ item, props }">
                                     <a v-ripple class="flex items-center" v-bind="props.action" :id="item.id" @click="handleItemClick(item)">
                                         <span :class="item.icon" />
@@ -75,13 +75,15 @@
                             </Menu>
                         </template>
                         <template v-else>
-                            <Menu :model="itemsConnecter" class="w-full">
+                            <Menu :model="itemsConnecter" class="w-full" appendTo="body">
                                 <template #start>
                                     <button v-ripple class="relative overflow-hidden w-full border-0 bg-transparent flex items-start p-2 pl-4 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-none cursor-pointer transition-colors duration-200">
                                         <img src="@/assets/img/user.png" class="w-[3rem] shrink-0 mr-2 border rounded-full" alt="Logo">
                                         <span class="inline-flex flex-col items-start">
                                             <span class="font-bold text-lg">{{ auth.user?.email || 'Invité' }}</span>
-                                            <span class="text-md">Admin</span>
+                                            <span class="text-md">
+                                                {{ auth.user?.role || 'Inconnu' }}
+                                            </span>
                                         </span>
                                     </button>
                                 </template>
@@ -293,7 +295,7 @@ function showNotifications() {
 function handleItemClick (item, position = 'center') {
     // envoyer un événement global pour fermer le menu
     window.dispatchEvent(new Event('close-topbar-menu'))
-    
+
     if (item.id === "logout") {
         confirm.require({
             // group: 'positioned',

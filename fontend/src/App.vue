@@ -34,4 +34,5 @@ const noTouche = useNoTouche();
 
 // Supprimer tous les toasts quand on change de route
 if (toast && toast.remove) toast.remove();
+
 </script>

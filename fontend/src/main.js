@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from '@/router';
-import { createPinia, setActivePinia  } from 'pinia';
+import { createPinia } from 'pinia';
 
 import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
@@ -20,6 +20,8 @@ import Rating from 'primevue/rating';
 
 import '@/assets/styles.scss';
 import '@/assets/style.css';
+
+import { useDeviceStore } from "@/function/stores/deviceStore";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -47,5 +49,9 @@ app.component('Rating', Rating);
 
 app.use(ToastService);
 app.use(ConfirmationService);
+
+// ✅ maintenant Pinia est actif
+const deviceStore = useDeviceStore(pinia);
+deviceStore.getDeviceId();
 
 app.mount('#app');
