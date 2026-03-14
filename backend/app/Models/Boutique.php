@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class specialite extends Model
+class Boutique extends Model
 {
     //
 }

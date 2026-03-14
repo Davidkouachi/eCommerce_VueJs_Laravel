@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class assurance extends Model
+class Pays extends Model
 {
     //
 }
